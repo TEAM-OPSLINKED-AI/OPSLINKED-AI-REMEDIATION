@@ -1,0 +1,12 @@
+log:
+  level: "info"
+server:
+  port: 8080
+  shutdownTimeout: 15
+smtp:
+  host: "smtp.example.com"
+  port: 587
+  username: "user@example.com"
+  password: "your-smtp-password"
+  fromEmail: "aiops@example.com"
+  toEmail: "sre-team@example.com,dev-team@example.com"
