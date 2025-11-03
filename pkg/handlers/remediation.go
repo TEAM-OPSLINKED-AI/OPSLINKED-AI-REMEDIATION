@@ -38,7 +38,7 @@ func (h *RemediationHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var action types.RemediationAction // Changed: types.RemediationAction 사용
+	var action types.RemediationAction // types.RemediationAction 사용
 	if err := json.NewDecoder(r.Body).Decode(&action); err != nil {
 		h.Logger.Error("Failed to decode request body", zap.Error(err))
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -57,8 +57,7 @@ func (h *RemediationHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	go h.handleAction(action)
 }
 
-func (h *RemediationHandler) handleAction(action types.RemediationAction) { // Changed: types.RemediationAction 사용
-	// ... (이하 로직은 동일)
+func (h *RemediationHandler) handleAction(action types.RemediationAction) { // types.RemediationAction 사용
     startTime := time.Now()
 	logger := h.Logger.With(
 		zap.String("actionType", action.ActionType),
@@ -98,7 +97,7 @@ func (h *RemediationHandler) handleAction(action types.RemediationAction) { // C
 	}
 
 	recipients := strings.Split(h.Config.SMTP.ToEmail, ",")
-    // Changed: 빈 문자열 슬라이스가 아닌지 확인
+    // 빈 문자열 슬라이스가 아닌지 확인
 	if len(recipients) > 0 && recipients[0] != "" {
 		err = notification.SendEmailNotification(h.Config.SMTP, action, success, details)
 		if err != nil {
