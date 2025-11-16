@@ -7,7 +7,12 @@ import (
 	"os/exec"
 	"time"
 
+	// Added: Cordon/Drain을 위한 import 추가
+	corev1 "k8s.io/api/core/v1"
+	policyv1 "k8s.io/api/policy/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields" // Added: Cordon/Drain을 위한 import 추가
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 )
@@ -67,8 +72,4 @@ func ExecuteNodeShellCommand(clientset *kubernetes.Clientset, nodeName string, p
 		return "", fmt.Errorf("failed to force logrotate: %s, error: %w", string(logrotateOutput), err)
 	}
 
-	result := fmt.Sprintf("Successfully executed commands on node '%s'.\nGzip output: %s\nLogrotate output: %s",
-		nodeName, string(gzipOutput), string(logrotateOutput))
-
-	return result, nil
-}
+	result := fmt.Sprintf("Successfully executed commands on node '%s'.\nGzip output: %s\n

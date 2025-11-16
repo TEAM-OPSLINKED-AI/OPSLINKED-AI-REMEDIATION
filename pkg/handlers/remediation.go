@@ -58,7 +58,7 @@ func (h *RemediationHandler) Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *RemediationHandler) handleAction(action types.RemediationAction) { // types.RemediationAction 사용
-    startTime := time.Now()
+	startTime := time.Now()
 	logger := h.Logger.With(
 		zap.String("actionType", action.ActionType),
 		zap.String("namespace", action.Namespace),
@@ -83,6 +83,21 @@ func (h *RemediationHandler) handleAction(action types.RemediationAction) { // t
 		usage := action.Parameters["usagePercentage"]
 		details = fmt.Sprintf("High-level alert for resource '%s/%s'. Current usage: %s%%. No automated action was taken.", action.Namespace, action.ResourceName, usage)
 		err = nil
+
+	// Added: Cordon/Drain 케이스 추가
+	case "CORDON_NODE":
+		// Cordon의 대상은 노드이므로, action.ResourceName에 노드 이름이 와야 합니다.
+		err = k8s.CordonNode(h.K8sClient, action.ResourceName)
+		if err == nil {
+			details = fmt.Sprintf("Successfully Cordoned node '%s'.", action.ResourceName)
+		}
+	case "DRAIN_NODE":
+		// Drain의 대상은 노드이므로, action.ResourceName에 노드 이름이 와야 합니다.
+		err = k8s.DrainNode(h.K8sClient, action.ResourceName)
+		if err == nil {
+			details = fmt.Sprintf("Successfully Drained (evicted pods, ignoring daemonsets) from node '%s'.", action.ResourceName)
+		}
+
 	default:
 		err = fmt.Errorf("unknown actionType: %s", action.ActionType)
 	}
@@ -97,7 +112,7 @@ func (h *RemediationHandler) handleAction(action types.RemediationAction) { // t
 	}
 
 	recipients := strings.Split(h.Config.SMTP.ToEmail, ",")
-    // 빈 문자열 슬라이스가 아닌지 확인
+	// 빈 문자열 슬라이스가 아닌지 확인
 	if len(recipients) > 0 && recipients[0] != "" {
 		err = notification.SendEmailNotification(h.Config.SMTP, action, success, details)
 		if err != nil {
