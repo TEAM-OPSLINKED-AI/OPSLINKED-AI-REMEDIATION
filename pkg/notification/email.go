@@ -10,6 +10,8 @@ import (
 	"opslinked-ai/remediation-module/pkg/types"
 )
 
+// Changed: SendEmailNotification 함수 전체를 STARTTLS를 지원하는
+//          더 견고한 방식으로 교체합니다.
 func SendEmailNotification(cfg config.SMTPConfig, action types.RemediationAction, success bool, details string) error {
 	if cfg.Host == "" || cfg.ToEmail == "" || cfg.FromEmail == "" {
 		return fmt.Errorf("SMTP configuration is incomplete")
@@ -85,12 +87,12 @@ Details:
 	if err != nil {
 		return fmt.Errorf("failed to get DATA writer: %w", err)
 	}
-	
+
 	_, err = wc.Write(msg)
 	if err != nil {
 		return fmt.Errorf("failed to write email body: %w", err)
 	}
-	
+
 	err = wc.Close()
 	if err != nil {
 		return fmt.Errorf("failed to close DATA writer: %w", err)

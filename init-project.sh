@@ -17,7 +17,7 @@ go run -ldflags="-extldflags=-lssp" main.go
 docker login
 
 # Docker 이미지 빌드
-docker build -t judemin/opslinked-ai-remediation:1.0 .
+docker build -t judemin/opslinked-ai-remediation:latest .
 
 # Docker 이미지 Push
-docker push judemin/opslinked-ai-remediation:1.0
+docker push judemin/opslinked-ai-remediation:latest
